@@ -18,6 +18,14 @@ function App() {
     setInputText("");
   };
 
+  const handleEdit = (id: number, newText: string) => {
+    setTodoList(
+      todoList.map((todo) =>
+        todo.id === id ? { id: id, text: newText } : todo
+      )
+    );
+  };
+
   return (
     <div>
       <form
@@ -38,7 +46,11 @@ function App() {
         {todoList.map((todo) => (
           <li key={todo.id}>
             <input type="checkbox" />
-            <input type="text" value={todo.text} />
+            <input
+              type="text"
+              value={todo.text}
+              onChange={(e) => handleEdit(todo.id, e.target.value)}
+            />
           </li>
         ))}
       </ul>
