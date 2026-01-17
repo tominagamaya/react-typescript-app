@@ -26,6 +26,10 @@ function App() {
     );
   };
 
+  const handleDelete = (id: number) => {
+    setTodoList(todoList.filter((todo) => todo.id !== id));
+  };
+
   return (
     <div>
       <form
@@ -50,6 +54,11 @@ function App() {
               type="text"
               value={todo.text}
               onChange={(e) => handleEdit(todo.id, e.target.value)}
+            />
+            <input
+              type="submit"
+              value="削除"
+              onClick={() => handleDelete(todo.id)}
             />
           </li>
         ))}
