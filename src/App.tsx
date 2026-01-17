@@ -1,15 +1,20 @@
 import { useState } from "react";
 import "./App.css";
 
+type Todo = {
+  text: string;
+  readonly id: number;
+};
+
 function App() {
   const [inputText, setInputText] = useState<string>("");
-  const [todoList, setTodoList] = useState<string[]>([]);
+  const [todoList, setTodoList] = useState<Todo[]>([]);
 
   const handleSubmit = () => {
     if (!inputText) {
       return;
     }
-    setTodoList([inputText, ...todoList]);
+    setTodoList([{ text: inputText, id: Date.now() }, ...todoList]);
     setInputText("");
   };
 
@@ -30,8 +35,11 @@ function App() {
         <input type="submit" value="追加" />
       </form>
       <ul>
-        {todoList.map((todo, index) => (
-          <li key={index}>{todo}</li>
+        {todoList.map((todo) => (
+          <li key={todo.id}>
+            <input type="checkbox" />
+            <input type="text" value={todo.text} />
+          </li>
         ))}
       </ul>
     </div>
