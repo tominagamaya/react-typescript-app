@@ -8,9 +8,12 @@ type Todo = {
   deleted?: boolean;
 };
 
+type Filter = "all" | "incomplete" | "complete" | "deleted";
+
 function App() {
   const [inputText, setInputText] = useState<string>("");
   const [todoList, setTodoList] = useState<Todo[]>([]);
+  const [filter, setFilter] = useState<Filter>("all");
 
   const handleSubmit = () => {
     if (!inputText) {
@@ -47,8 +50,33 @@ function App() {
     );
   };
 
+  const handleFilter = (selectedValue: Filter) => {
+    setFilter(selectedValue);
+  };
+
+  const filteredInitialTodos = todoList.filter((todo) => {
+    if (filter === "all") {
+      return !todo.deleted;
+    } else if (filter === "incomplete") {
+      return !todo.checked && !todo.deleted;
+    } else if (filter === "complete") {
+      return todo.checked && !todo.deleted;
+    } else if (filter === "deleted") {
+      return todo.deleted;
+    } else {
+      todoList;
+    }
+  });
+
   return (
     <div>
+      <select onChange={(e) => handleFilter(e.target.value as Filter)}>
+        <option value="all">すべて</option>
+        <option value="incomplete">未完了</option>
+        <option value="complete">完了済み</option>
+        <option value="deleted">削除済み</option>
+      </select>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -64,23 +92,25 @@ function App() {
         <input type="submit" value="追加" />
       </form>
       <ul>
-        {todoList
-          .filter((todo) => !todo.deleted)
-          .map((todo) => (
-            <li key={todo.id}>
-              <input type="checkbox" onChange={() => handleCheck(todo.id)} />
-              <input
-                type="text"
-                value={todo.text}
-                onChange={(e) => handleEdit(todo.id, e.target.value)}
-              />
-              <input
-                type="submit"
-                value="削除"
-                onClick={() => handleDelete(todo.id)}
-              />
-            </li>
-          ))}
+        {filteredInitialTodos.map((todo) => (
+          <li key={todo.id}>
+            <input
+              type="checkbox"
+              onChange={() => handleCheck(todo.id)}
+              checked={todo.checked}
+            />
+            <input
+              type="text"
+              value={todo.text}
+              onChange={(e) => handleEdit(todo.id, e.target.value)}
+            />
+            <input
+              type="submit"
+              value="削除"
+              onClick={() => handleDelete(todo.id)}
+            />
+          </li>
+        ))}
       </ul>
     </div>
   );
