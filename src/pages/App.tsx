@@ -1,14 +1,7 @@
 import { useState } from "react";
 import "./App.css";
-
-type Todo = {
-  text: string;
-  readonly id: number;
-  checked?: boolean;
-  deleted?: boolean;
-};
-
-type Filter = "all" | "incomplete" | "complete" | "deleted";
+import type { Filter, Todo } from "../types/Todo";
+import { TodoList } from "../components/todo/TodoList";
 
 function App() {
   const [inputText, setInputText] = useState<string>("");
@@ -105,27 +98,12 @@ function App() {
         />
         <input type="submit" value="追加" />
       </form>
-      <ul>
-        {filteredInitialTodos.map((todo) => (
-          <li key={todo.id}>
-            <input
-              type="checkbox"
-              onChange={() => handleCheck(todo.id)}
-              checked={todo.checked}
-            />
-            <input
-              type="text"
-              value={todo.text}
-              onChange={(e) => handleEdit(todo.id, e.target.value)}
-            />
-            <input
-              type="submit"
-              value="削除"
-              onClick={() => handleDelete(todo.id)}
-            />
-          </li>
-        ))}
-      </ul>
+      <TodoList
+        todoList={filteredInitialTodos}
+        handleCheck={handleCheck}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 }
