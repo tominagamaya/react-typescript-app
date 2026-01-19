@@ -14,7 +14,7 @@ function App() {
   const [inputText, setInputText] = useState<string>("");
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchWords, setSearchWords] = useState<string[]>([]);
 
   const handleSubmit = () => {
     if (!inputText) {
@@ -56,8 +56,8 @@ function App() {
   };
 
   const filteredInitialTodos = todoList.filter((todo) => {
-    if (searchText) {
-      return todo.text.toLowerCase().includes(searchText.toLowerCase());
+    if (searchWords.length > 0) {
+      return searchWords.every((word) => todo.text.includes(word));
     }
     if (filter === "all") {
       return !todo.deleted;
@@ -73,7 +73,7 @@ function App() {
   });
 
   const handleSearch = (searchText: string) => {
-    return setSearchText(searchText);
+    return setSearchWords(searchText.trim().replace(/\s+/g, " ").split(" "));
   };
 
   return (
@@ -87,6 +87,7 @@ function App() {
       <input
         type="text"
         className="searchInput"
+        autoComplete={"on"}
         onChange={(e) => handleSearch(e.target.value)}
       />
 
