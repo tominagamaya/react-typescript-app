@@ -14,6 +14,7 @@ function App() {
   const [inputText, setInputText] = useState<string>("");
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
+  const [searchText, setSearchText] = useState<string>("");
 
   const handleSubmit = () => {
     if (!inputText) {
@@ -55,6 +56,9 @@ function App() {
   };
 
   const filteredInitialTodos = todoList.filter((todo) => {
+    if (searchText) {
+      return todo.text.toLowerCase().includes(searchText.toLowerCase());
+    }
     if (filter === "all") {
       return !todo.deleted;
     } else if (filter === "incomplete") {
@@ -68,6 +72,10 @@ function App() {
     }
   });
 
+  const handleSearch = (searchText: string) => {
+    return setSearchText(searchText);
+  };
+
   return (
     <div>
       <select onChange={(e) => handleFilter(e.target.value as Filter)}>
@@ -76,6 +84,11 @@ function App() {
         <option value="complete">完了済み</option>
         <option value="deleted">削除済み</option>
       </select>
+      <input
+        type="text"
+        className="searchInput"
+        onChange={(e) => handleSearch(e.target.value)}
+      />
 
       <form
         onSubmit={(e) => {
