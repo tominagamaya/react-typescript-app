@@ -1,7 +1,7 @@
 import { useState } from "react";
-import "./App.css";
 import type { Filter, Todo } from "../types/Todo";
 import { TodoList } from "../components/todo/TodoList";
+import { Search } from "lucide-react";
 
 function App() {
   const [inputText, setInputText] = useState<string>("");
@@ -23,24 +23,24 @@ function App() {
   const handleEdit = (id: number, newText: string) => {
     setTodoList(
       todoList.map((todo) =>
-        todo.id === id ? { id: id, text: newText } : todo
-      )
+        todo.id === id ? { id: id, text: newText } : todo,
+      ),
     );
   };
 
   const handleCheck = (id: number) => {
     setTodoList(
       todoList.map((todo) =>
-        todo.id === id ? { ...todo, checked: !todo.checked } : todo
-      )
+        todo.id === id ? { ...todo, checked: !todo.checked } : todo,
+      ),
     );
   };
 
   const handleDelete = (id: number) => {
     setTodoList(
       todoList.map((todo) =>
-        todo.id === id ? { ...todo, deleted: true } : todo
-      )
+        todo.id === id ? { ...todo, deleted: true } : todo,
+      ),
     );
   };
 
@@ -70,33 +70,51 @@ function App() {
   };
 
   return (
-    <div>
-      <select onChange={(e) => handleFilter(e.target.value as Filter)}>
-        <option value="all">すべて</option>
-        <option value="incomplete">未完了</option>
-        <option value="complete">完了済み</option>
-        <option value="deleted">削除済み</option>
-      </select>
-      <input
-        type="text"
-        className="searchInput"
-        autoComplete={"on"}
-        onChange={(e) => handleSearch(e.target.value)}
-      />
+    <div className="min-h-screen p-4 sm:p-6 md:p-8">
+      <div className={"flex items-center gap-5"}>
+        <select
+          onChange={(e) => handleFilter(e.target.value as Filter)}
+          className={
+            "border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
+          }
+        >
+          <option value="all">すべて</option>
+          <option value="incomplete">未完了</option>
+          <option value="complete">完了済み</option>
+          <option value="deleted">削除済み</option>
+        </select>
+
+        <div className="flex items-center min-w-[380px] gap-1">
+          <Search color="grey" size={20} />
+          <input
+            type="text"
+            className="border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
+            autoComplete={"on"}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="絞り込み検索"
+          />
+        </div>
+      </div>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
+        className="mt-2 flex items-center gap-2"
       >
         <input
           type="text"
           value={inputText}
           placeholder="TODOを入力"
           onChange={(e) => setInputText(e.target.value)}
+          className="border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
         />
-        <input type="submit" value="追加" />
+        <input
+          type="submit"
+          value="追加"
+          className="h-10 w-16 px-4 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-md transition-colors duration-200"
+        />
       </form>
       <TodoList
         todoList={filteredInitialTodos}
