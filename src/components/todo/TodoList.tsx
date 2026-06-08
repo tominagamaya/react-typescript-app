@@ -7,6 +7,9 @@ type Props = {
   handleDelete: (id: number) => void;
 };
 
+/**
+ * TODOリストのコンポーネント
+ */
 export function TodoList({
   todoList,
   handleCheck,

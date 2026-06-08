@@ -9,6 +9,9 @@ function App() {
   const [filter, setFilter] = useState<Filter>("all");
   const [searchWords, setSearchWords] = useState<string[]>([]);
 
+  /**
+   * TODO追加
+   */
   const handleSubmit = () => {
     if (!inputText) {
       return;
@@ -20,6 +23,9 @@ function App() {
     setInputText("");
   };
 
+  /**
+   * TODO入力
+   */
   const handleEdit = (id: number, newText: string) => {
     setTodoList(
       todoList.map((todo) =>
@@ -28,6 +34,9 @@ function App() {
     );
   };
 
+  /**
+   * TODOの完了・未完了の切り替え
+   */
   const handleCheck = (id: number) => {
     setTodoList(
       todoList.map((todo) =>
@@ -36,6 +45,9 @@ function App() {
     );
   };
 
+  /**
+   * TODO削除
+   */
   const handleDelete = (id: number) => {
     setTodoList(
       todoList.map((todo) =>
@@ -44,6 +56,10 @@ function App() {
     );
   };
 
+  /**
+   * ステータスの絞り込み
+   * @param selectedValue
+   */
   const handleFilter = (selectedValue: Filter) => {
     setFilter(selectedValue);
   };
@@ -61,10 +77,13 @@ function App() {
     } else if (filter === "deleted") {
       return todo.deleted;
     } else {
-      todoList;
+      return todoList;
     }
   });
 
+  /**
+   * 文字列での絞り込み
+   */
   const handleSearch = (searchText: string) => {
     return setSearchWords(searchText.trim().replace(/\s+/g, " ").split(" "));
   };
