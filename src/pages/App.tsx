@@ -90,7 +90,7 @@ function App() {
 
   return (
     <div className="min-h-screen p-4 sm:p-6 md:p-8">
-      <div className={"flex items-center gap-5"}>
+      <div className={"flex items-center gap-3"}>
         <select
           onChange={(e) => handleFilter(e.target.value as Filter)}
           className={
@@ -103,11 +103,11 @@ function App() {
           <option value="deleted">削除済み</option>
         </select>
 
-        <div className="flex items-center min-w-[380px] gap-1">
+        <div className="flex items-center min-w-[160px] gap-1">
           <Search color="grey" size={20} />
           <input
             type="text"
-            className="border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
+            className="min-w-[160px] border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
             autoComplete={"on"}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="絞り込み検索"
