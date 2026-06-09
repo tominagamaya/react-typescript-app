@@ -16,8 +16,8 @@ export function useTodoActions() {
       return;
     }
     setAllTodoList([
-      { text: inputText, id: Date.now(), checked: false, deleted: false },
       ...allTodoList,
+      { text: inputText, id: Date.now(), checked: false, deleted: false },
     ]);
     setInputText("");
   };
