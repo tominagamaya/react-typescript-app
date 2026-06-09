@@ -1,9 +1,8 @@
 import { usePosts } from "../../hooks/usePosts";
 export function PostList() {
-  const { posts, hasMore, onLoadMore, isPending, error } = usePosts();
+  const { posts, hasMore, onLoadMore, isPending } = usePosts();
 
   if (isPending) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -13,9 +12,11 @@ export function PostList() {
         ))}
       </ul>
       {hasMore && (
-        <button onClick={onLoadMore} disabled={isPending}>
-          {isPending ? "Loading..." : "もっとみる"}
-        </button>
+        <form action={onLoadMore}>
+          <button type="submit" disabled={isPending}>
+            {isPending ? "Loading..." : "もっとみる"}
+          </button>
+        </form>
       )}
     </>
   );

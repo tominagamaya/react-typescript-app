@@ -1,35 +1,41 @@
-import { useEffect, useState, useTransition } from "react";
+import { use, useActionState } from "react";
 import { fetchPosts } from "../api/posts";
 import type { Post } from "../types/Post";
 
 const LIMIT_SIZE = 10;
 
-export function usePosts() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [isPending, startTransition] = useTransition();
+interface PostsState {
+  posts: Post[];
+  page: number;
+  hasMore: boolean;
+}
 
-  const load = async () => {
-    startTransition(async () => {
+const initialPostsPromise = fetchPosts(1, LIMIT_SIZE);
+
+export function usePosts() {
+  const initialData = use(initialPostsPromise) || [];
+
+  const [state, loadMoreAction, isPending] = useActionState<PostsState>(
+    async (prevState) => {
       try {
-        const data = await fetchPosts(page, LIMIT_SIZE);
-        if (data) {
-          setPosts((prevPosts) => [...prevPosts, ...data]);
-          setPage((prevPage) => prevPage + 1);
-          setHasMore(data.length === LIMIT_SIZE);
-        }
+        const data = await fetchPosts(prevState.page, LIMIT_SIZE);
+        return {
+          posts: [...prevState.posts, ...data],
+          page: prevState.page + 1,
+          hasMore: data.length === LIMIT_SIZE,
+        };
       } catch (error) {
         console.error("Failed to fetch posts:", error);
-        setError((error as Error).message);
+        return prevState;
       }
-    });
+    },
+    { posts: initialData, page: 2, hasMore: true },
+  );
+
+  return {
+    posts: state.posts,
+    isPending,
+    hasMore: state.hasMore,
+    onLoadMore: loadMoreAction,
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  return { posts, isPending, error, hasMore, onLoadMore: load };
 }
