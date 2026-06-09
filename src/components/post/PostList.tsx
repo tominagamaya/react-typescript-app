@@ -8,8 +8,8 @@ export function PostList() {
   return (
     <>
       <ul>
-        {posts.map((post) => (
-          <li key={post.id}>{post.title}</li>
+        {posts.map((post, index) => (
+          <li key={`${post.id}-${index}`}>{post.title}</li>
         ))}
       </ul>
       {hasMore && (
