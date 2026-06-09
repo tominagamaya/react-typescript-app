@@ -1,12 +1,16 @@
 import { useState } from "react";
-import type { Filter, Todo } from "../types/Todo";
+import type { Todo } from "../types/Todo";
 import { TodoList } from "../components/todo/TodoList";
-import { Search } from "lucide-react";
+import { SearchInput } from "../components/ui/SearchInput";
+import { Selector } from "../components/ui/Selector";
+import { TODO_STATUS, type TODO_STATUS_FILTER } from "../constants/selectors";
+import { InputText } from "../components/ui/InputText";
+import { Button } from "../components/ui/Button";
 
 function App() {
   const [inputText, setInputText] = useState<string>("");
   const [todoList, setTodoList] = useState<Todo[]>([]);
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<TODO_STATUS_FILTER>("all");
   const [searchWords, setSearchWords] = useState<string[]>([]);
 
   /**
@@ -60,7 +64,7 @@ function App() {
    * ステータスの絞り込み
    * @param selectedValue
    */
-  const handleFilter = (selectedValue: Filter) => {
+  const handleFilter = (selectedValue: TODO_STATUS_FILTER) => {
     setFilter(selectedValue);
   };
 
@@ -91,49 +95,22 @@ function App() {
   return (
     <div className="min-h-screen p-4 sm:p-6 md:p-8">
       <div className={"flex items-center gap-3"}>
-        <select
-          onChange={(e) => handleFilter(e.target.value as Filter)}
-          className={
-            "border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
-          }
-        >
-          <option value="all">すべて</option>
-          <option value="incomplete">未完了</option>
-          <option value="complete">完了済み</option>
-          <option value="deleted">削除済み</option>
-        </select>
-
-        <div className="flex items-center min-w-[160px] gap-1">
-          <Search color="grey" size={20} />
-          <input
-            type="text"
-            className="min-w-[160px] border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
-            autoComplete={"on"}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="絞り込み検索"
-          />
-        </div>
+        <Selector options={TODO_STATUS} handleFilter={handleFilter} />
+        <SearchInput handleSearch={handleSearch} />
       </div>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit();
         }}
         className="mt-2 flex items-center gap-2"
       >
-        <input
-          type="text"
+        <InputText
           value={inputText}
           placeholder="TODOを入力"
-          onChange={(e) => setInputText(e.target.value)}
-          className="w-full max-w-[348px] border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
+          onChange={setInputText}
         />
-        <input
-          type="submit"
-          value="追加"
-          className="h-10 w-16 px-4 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-md transition-colors duration-200"
-        />
+        <Button onClick={handleSubmit}>追加</Button>
       </form>
       <TodoList
         todoList={filteredInitialTodos}

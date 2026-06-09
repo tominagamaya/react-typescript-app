@@ -4,5 +4,3 @@ export type Todo = {
   checked?: boolean;
   deleted?: boolean;
 };
-
-export type Filter = "all" | "incomplete" | "complete" | "deleted";
