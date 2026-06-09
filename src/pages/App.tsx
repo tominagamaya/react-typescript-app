@@ -26,18 +26,13 @@ function App() {
         <SearchInput handleSearch={handleSearch} />
       </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-        className="mt-2 flex items-center gap-2"
-      >
+      <form action={handleSubmit} className="mt-2 flex items-center gap-2">
         <InputText
           value={inputText}
           placeholder="TODOを入力"
           onChange={setInputText}
         />
-        <Button onClick={handleSubmit}>追加</Button>
+        <Button>追加</Button>
       </form>
       <TodoList
         todoList={filteredInitialTodos}

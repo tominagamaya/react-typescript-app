@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { startTransition, useOptimistic, useState } from "react";
 import type { TODO_STATUS_FILTER } from "../constants/selectors";
 import type { Todo } from "../types/Todo";
 
@@ -7,6 +7,10 @@ export function useTodoActions() {
   const [allTodoList, setAllTodoList] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TODO_STATUS_FILTER>("all");
   const [searchWords, setSearchWords] = useState<string[]>([]);
+  const [optimisticTodos, setOptimisticTodos] = useOptimistic<Todo[], Todo[]>(
+    allTodoList,
+    (_currentTodoList, newTodoList: Todo[]) => newTodoList,
+  );
 
   /**
    * TODO追加
@@ -26,33 +30,39 @@ export function useTodoActions() {
    * TODO入力
    */
   const handleEdit = (id: number, newText: string) => {
-    setAllTodoList(
-      allTodoList.map((todo) =>
-        todo.id === id ? { id: id, text: newText } : todo,
-      ),
+    const updateTodoList = allTodoList.map((todo) =>
+      todo.id === id ? { id: id, text: newText } : todo,
     );
+    startTransition(() => {
+      setOptimisticTodos(updateTodoList);
+    });
+    setAllTodoList(updateTodoList);
   };
 
   /**
    * TODOの完了・未完了の切り替え
    */
   const handleCheck = (id: number) => {
-    setAllTodoList(
-      allTodoList.map((todo) =>
-        todo.id === id ? { ...todo, checked: !todo.checked } : todo,
-      ),
+    const updateTodoList = allTodoList.map((todo) =>
+      todo.id === id ? { ...todo, checked: !todo.checked } : todo,
     );
+    startTransition(() => {
+      setOptimisticTodos(updateTodoList);
+    });
+    setAllTodoList(updateTodoList);
   };
 
   /**
    * TODO削除
    */
   const handleDelete = (id: number) => {
-    setAllTodoList(
-      allTodoList.map((todo) =>
-        todo.id === id ? { ...todo, deleted: true } : todo,
-      ),
+    const updateTodoList = allTodoList.map((todo) =>
+      todo.id === id ? { ...todo, deleted: true } : todo,
     );
+    startTransition(() => {
+      setOptimisticTodos(updateTodoList);
+    });
+    setAllTodoList(updateTodoList);
   };
 
   /**
@@ -65,7 +75,7 @@ export function useTodoActions() {
   /**
    * 表示するTODOリスト
    */
-  const filteredInitialTodos = allTodoList.filter((todo) => {
+  const filteredInitialTodos = optimisticTodos.filter((todo) => {
     const matchesSearch = searchWords.every((word) => todo.text.includes(word));
     if (!matchesSearch) {
       return false;
