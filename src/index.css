@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+:root {
+  --base: oklch(0.89 0.01 285);
+  --hover: oklch(0.99 0.03 285);
+}
+
+@theme {
+  --color-base: var(--base);
+  --color-hover: var(--hover);
+}
