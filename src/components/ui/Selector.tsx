@@ -13,9 +13,7 @@ export function Selector<T extends string>({
   return (
     <select
       onChange={(e) => handleFilter && handleFilter(e.target.value as T)}
-      className={
-        "border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500"
-      }
+      className={"input-standard"}
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>

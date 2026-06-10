@@ -9,3 +9,7 @@
   --color-base: var(--base);
   --color-hover: var(--hover);
 }
+
+@utility input-standard {
+  @apply border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500;
+}
