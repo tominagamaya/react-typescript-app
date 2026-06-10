@@ -1,5 +1,5 @@
 import type { Todo } from "../../types/Todo";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/Table";
 
 type Props = {
