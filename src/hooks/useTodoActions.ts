@@ -1,6 +1,7 @@
 import { startTransition, useOptimistic, useState } from "react";
 import type { TODO_STATUS_FILTER } from "../constants/selectors";
 import type { Todo } from "../types/Todo";
+import { API_BASE_URL } from "@/constants/api";
 
 export function useTodoActions() {
   const [inputText, setInputText] = useState<string>("");
@@ -16,7 +17,7 @@ export function useTodoActions() {
    * TODOリストの取得
    */
   const fetchTodoList = async () => {
-    fetch("http://localhost:3000/api/todos")
+    fetch(`${API_BASE_URL}/api/todos`)
       .then((res) => res.json())
       .then((data) => {
         startTransition(() => {
