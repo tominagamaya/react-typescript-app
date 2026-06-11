@@ -33,15 +33,55 @@ export function useTodoActions() {
   /**
    * TODO追加
    */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!inputText) {
       return;
     }
-    setAllTodoList([
-      ...allTodoList,
-      { text: inputText, id: Date.now(), checked: false, deleted: false },
-    ]);
-    setInputText("");
+    fetch(`${API_BASE_URL}/api/todos`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: { text: inputText } }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        startTransition(() => {
+          setOptimisticTodos([...optimisticTodos, data]);
+        });
+        setAllTodoList([...allTodoList, data]);
+        setInputText("");
+        fetchTodoList();
+      })
+      .catch((error) => {
+        console.error("データ追加失敗:", error);
+      });
+  };
+
+  /**
+   * TODO更新
+   */
+  const updateTodo = async (id: number, updatedFields: Partial<Todo>) => {
+    const updatedTodo = allTodoList.find((todo) => todo.id === id);
+    if (!updatedTodo) {
+      console.error("TODOが見つかりません:", id);
+      return;
+    }
+    const newTodo = { ...updatedTodo, ...updatedFields };
+    fetch(`${API_BASE_URL}/api/todos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: newTodo }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        fetchTodoList();
+      })
+      .catch((error) => {
+        console.error("データ更新失敗:", error);
+      });
   };
 
   /**
@@ -55,6 +95,7 @@ export function useTodoActions() {
       setOptimisticTodos(updateTodoList);
     });
     setAllTodoList(updateTodoList);
+    updateTodo(id, { text: newText });
   };
 
   /**
@@ -68,6 +109,9 @@ export function useTodoActions() {
       setOptimisticTodos(updateTodoList);
     });
     setAllTodoList(updateTodoList);
+    updateTodo(id, {
+      checked: !allTodoList.find((todo) => todo.id === id)?.checked,
+    });
   };
 
   /**
@@ -81,6 +125,7 @@ export function useTodoActions() {
       setOptimisticTodos(updateTodoList);
     });
     setAllTodoList(updateTodoList);
+    updateTodo(id, { deleted: true });
   };
 
   /**
