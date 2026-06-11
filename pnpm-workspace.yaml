@@ -1,2 +1,6 @@
 allowBuilds:
+  better-sqlite3: true
   esbuild: false
+packages:
+  - "."
+  - "server"

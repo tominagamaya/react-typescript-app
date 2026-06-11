@@ -3,10 +3,13 @@ import cors from "cors";
 import path from "path";
 import dotenv from "dotenv";
 import Database from "better-sqlite3";
+import { fileURLToPath } from "url";
 
 // サーバー環境変数の読み込み
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const env = process.env.NODE_ENV;
-dotenv.config({ path: path.resolve(process.cwd(), `.env.${env}`) });
+dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
 const app = express();
 
 // フロント環境変数の読み込み
