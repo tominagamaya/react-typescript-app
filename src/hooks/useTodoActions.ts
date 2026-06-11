@@ -13,6 +13,23 @@ export function useTodoActions() {
   );
 
   /**
+   * TODOリストの取得
+   */
+  const fetchTodoList = async () => {
+    fetch("http://localhost:3000/api/todos")
+      .then((res) => res.json())
+      .then((data) => {
+        startTransition(() => {
+          setOptimisticTodos(data);
+        });
+        setAllTodoList(data);
+      })
+      .catch((error) => {
+        console.error("データ取得失敗:", error);
+      });
+  };
+
+  /**
    * TODO追加
    */
   const handleSubmit = () => {
@@ -110,5 +127,6 @@ export function useTodoActions() {
     handleSearch,
     inputText,
     setInputText,
+    fetchTodoList,
   };
 }
