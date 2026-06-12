@@ -1,7 +1,7 @@
 import { startTransition, useOptimistic, useState } from "react";
 import type { TODO_STATUS_FILTER } from "../constants/selectors";
 import type { Todo } from "../types/Todo";
-import { API_BASE_URL } from "@/constants/api";
+import { apiClient } from "@/lib/apiClient";
 
 export function useTodoActions() {
   const [inputText, setInputText] = useState<string>("");
@@ -17,17 +17,19 @@ export function useTodoActions() {
    * TODOリストの取得
    */
   const fetchTodoList = async () => {
-    fetch(`${API_BASE_URL}/api/todos`)
-      .then((res) => res.json())
-      .then((data) => {
+    try {
+      apiClient({
+        method: "GET",
+        path: "/api/todos",
+      }).then((res) => {
         startTransition(() => {
-          setOptimisticTodos(data);
+          setOptimisticTodos(res);
         });
-        setAllTodoList(data);
-      })
-      .catch((error) => {
-        console.error("データ取得失敗:", error);
+        setAllTodoList(res);
       });
+    } catch (error) {
+      console.error("データ取得失敗:", error);
+    }
   };
 
   /**
@@ -37,25 +39,22 @@ export function useTodoActions() {
     if (!inputText) {
       return;
     }
-    fetch(`${API_BASE_URL}/api/todos`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data: { text: inputText } }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    try {
+      await apiClient({
+        method: "POST",
+        path: "/api/todos",
+        data: { text: inputText },
+      }).then((res) => {
         startTransition(() => {
-          setOptimisticTodos([...optimisticTodos, data]);
+          setOptimisticTodos([...optimisticTodos, res]);
         });
-        setAllTodoList([...allTodoList, data]);
+        setAllTodoList([...allTodoList, res]);
         setInputText("");
         fetchTodoList();
-      })
-      .catch((error) => {
-        console.error("データ追加失敗:", error);
       });
+    } catch (error) {
+      console.error("データ追加失敗:", error);
+    }
   };
 
   /**
@@ -68,20 +67,17 @@ export function useTodoActions() {
       return;
     }
     const newTodo = { ...updatedTodo, ...updatedFields };
-    fetch(`${API_BASE_URL}/api/todos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data: newTodo }),
-    })
-      .then((res) => res.json())
-      .then(() => {
+    try {
+      apiClient({
+        method: "PUT",
+        path: `/api/todos/${id}`,
+        data: { data: newTodo },
+      }).then(() => {
         fetchTodoList();
-      })
-      .catch((error) => {
-        console.error("データ更新失敗:", error);
       });
+    } catch (error) {
+      console.error("データ更新失敗:", error);
+    }
   };
 
   /**

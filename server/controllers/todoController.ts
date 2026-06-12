@@ -40,12 +40,17 @@ export const getAllTodos = (_req: Request, res: Response) => {
  */
 export const addTodo = (req: Request, res: Response) => {
   try {
-    const { data } = req.body;
-    if (!data) {
+    const { text } = req.body;
+    if (!text) {
       return res.status(400).json({ error: "必須項目が不足しています" });
     }
-    const result = insertTodo(data.text);
-    const newTodo = { id: result.lastInsertRowid, ...data };
+    const result = insertTodo(text);
+    const newTodo = {
+      id: result.lastInsertRowid,
+      text,
+      checked: false,
+      deleted: false,
+    };
     res.status(201).json(newTodo);
   } catch (error) {
     res.status(500).json({ error: "データ追加に失敗しました" });
