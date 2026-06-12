@@ -5,7 +5,6 @@ import { TODO_STATUS } from "../constants/selectors";
 import { InputText } from "../components/ui/InputText";
 import { Button } from "../components/ui/Button";
 import { useTodoActions } from "../hooks/useTodoActions";
-import { useEffect } from "react";
 
 function App() {
   const {
@@ -18,12 +17,7 @@ function App() {
     handleSearch,
     inputText,
     setInputText,
-    fetchTodoList,
   } = useTodoActions();
-
-  useEffect(() => {
-    fetchTodoList();
-  }, []);
 
   return (
     <div className="min-h-screen p-4 sm:p-6 md:p-8">

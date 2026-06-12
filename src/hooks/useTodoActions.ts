@@ -1,36 +1,32 @@
-import { startTransition, useOptimistic, useState } from "react";
+import { useState } from "react";
 import type { TODO_STATUS_FILTER } from "../constants/selectors";
 import type { Todo } from "../types/Todo";
 import { apiClient } from "@/lib/apiClient";
+import { useQuery } from "@tanstack/react-query";
 
 export function useTodoActions() {
   const [inputText, setInputText] = useState<string>("");
-  const [allTodoList, setAllTodoList] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TODO_STATUS_FILTER>("all");
   const [searchWords, setSearchWords] = useState<string[]>([]);
-  const [optimisticTodos, setOptimisticTodos] = useOptimistic<Todo[], Todo[]>(
-    allTodoList,
-    (_currentTodoList, newTodoList: Todo[]) => newTodoList,
-  );
 
   /**
    * TODOリストの取得
    */
   const fetchTodoList = async () => {
     try {
-      apiClient({
+      return await apiClient({
         method: "GET",
         path: "/api/todos",
-      }).then((res) => {
-        startTransition(() => {
-          setOptimisticTodos(res);
-        });
-        setAllTodoList(res);
       });
     } catch (error) {
       console.error("データ取得失敗:", error);
     }
   };
+
+  const { data: allTodoList = [] as Todo[], refetch } = useQuery({
+    queryKey: ["todos"],
+    queryFn: fetchTodoList,
+  });
 
   /**
    * TODO追加
@@ -40,17 +36,13 @@ export function useTodoActions() {
       return;
     }
     try {
-      await apiClient({
+      return await apiClient({
         method: "POST",
         path: "/api/todos",
         data: { text: inputText },
-      }).then((res) => {
-        startTransition(() => {
-          setOptimisticTodos([...optimisticTodos, res]);
-        });
-        setAllTodoList([...allTodoList, res]);
+      }).then(() => {
         setInputText("");
-        fetchTodoList();
+        refetch();
       });
     } catch (error) {
       console.error("データ追加失敗:", error);
@@ -61,19 +53,19 @@ export function useTodoActions() {
    * TODO更新
    */
   const updateTodo = async (id: number, updatedFields: Partial<Todo>) => {
-    const updatedTodo = allTodoList.find((todo) => todo.id === id);
+    const updatedTodo = allTodoList.find((todo: Todo) => todo.id === id);
     if (!updatedTodo) {
       console.error("TODOが見つかりません:", id);
       return;
     }
     const newTodo = { ...updatedTodo, ...updatedFields };
     try {
-      apiClient({
+      return await apiClient({
         method: "PUT",
         path: `/api/todos/${id}`,
         data: { data: newTodo },
       }).then(() => {
-        fetchTodoList();
+        refetch();
       });
     } catch (error) {
       console.error("データ更新失敗:", error);
@@ -84,13 +76,6 @@ export function useTodoActions() {
    * TODO入力
    */
   const handleEdit = (id: number, newText: string) => {
-    const updateTodoList = allTodoList.map((todo) =>
-      todo.id === id ? { id: id, text: newText } : todo,
-    );
-    startTransition(() => {
-      setOptimisticTodos(updateTodoList);
-    });
-    setAllTodoList(updateTodoList);
     updateTodo(id, { text: newText });
   };
 
@@ -98,15 +83,8 @@ export function useTodoActions() {
    * TODOの完了・未完了の切り替え
    */
   const handleCheck = (id: number) => {
-    const updateTodoList = allTodoList.map((todo) =>
-      todo.id === id ? { ...todo, checked: !todo.checked } : todo,
-    );
-    startTransition(() => {
-      setOptimisticTodos(updateTodoList);
-    });
-    setAllTodoList(updateTodoList);
     updateTodo(id, {
-      checked: !allTodoList.find((todo) => todo.id === id)?.checked,
+      checked: !allTodoList.find((todo: Todo) => todo.id === id)?.checked,
     });
   };
 
@@ -114,13 +92,6 @@ export function useTodoActions() {
    * TODO削除
    */
   const handleDelete = (id: number) => {
-    const updateTodoList = allTodoList.map((todo) =>
-      todo.id === id ? { ...todo, deleted: true } : todo,
-    );
-    startTransition(() => {
-      setOptimisticTodos(updateTodoList);
-    });
-    setAllTodoList(updateTodoList);
     updateTodo(id, { deleted: true });
   };
 
@@ -134,7 +105,7 @@ export function useTodoActions() {
   /**
    * 表示するTODOリスト
    */
-  const filteredInitialTodos = optimisticTodos.filter((todo) => {
+  const filteredInitialTodos = allTodoList.filter((todo: Todo) => {
     const matchesSearch = searchWords.every((word) => todo.text.includes(word));
     if (!matchesSearch) {
       return false;
@@ -169,6 +140,5 @@ export function useTodoActions() {
     handleSearch,
     inputText,
     setInputText,
-    fetchTodoList,
   };
 }
